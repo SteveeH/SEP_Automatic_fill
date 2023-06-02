@@ -15,7 +15,7 @@ URL = "https://sep.teamexact.cz/dochazka"
 COOKIE = {"PHPSESSID": None}
 
 INPUT_FILE = "dochazka_test.csv"
-USER_ID = "64" # Filip Raus
+USER_ID = None # string ex. "1234", id can be get by program provider
 
 # for now is used same id_type, id_location and id_stredisko for all records
 """

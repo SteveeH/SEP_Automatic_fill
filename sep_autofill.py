@@ -36,7 +36,7 @@ id_location:
     2 - Home Office
     3 - Prace v terenu
 """
-ID_STREDISKO = "3"
+ID_STREDISKO = "11" 
 ID_LOCATION = "1"
 ID_TYPE = "10" # bezna cinnost
 # ------------------
@@ -50,6 +50,7 @@ def create_record_payload(
     from_hour: str,
     to_hour: str,
     project_identifier: str,
+    note: str = "",
 ) -> dict:
     """Create payload for record from CSV file."""
 
@@ -61,7 +62,7 @@ def create_record_payload(
         "data[id_type]": ID_TYPE,
         "data[id_project]": get_project_id(project_identifier),
         "data[id_location]": ID_LOCATION,
-        "data[note]": "",
+        "data[note]": note,
         "data[id_user]": USER_ID,
         "doDochazka": "",
     }
@@ -89,7 +90,7 @@ def hour_float2str(hour: float) -> str:
 def main():
     month_hours = 0
 
-    with open(INPUT_FILE, "r") as f:
+    with open(INPUT_FILE, "r",encoding='utf8') as f:
         records_to_send = []
         for line in f.readlines():
             try:
@@ -100,10 +101,21 @@ def main():
                 datum = record[0]
                 from_hour = record[1]
                 to_hour = record[2]
-                project_identifiers = [""]
+                project_identifiers = [("","")]
 
                 if len(record) == 4:
-                    project_identifiers = record[3].split(",")
+                    p_ids = record[3].split(",")
+
+                    project_identifiers = []
+
+                    for p_id in p_ids:
+
+                        p_id_split = p_id.split("-")
+                        if len(p_id_split) == 2:
+                            project_identifiers.append((p_id_split[0], p_id_split[1]))
+                        else:
+                            project_identifiers.append((p_id_split[0], ""))
+                        
 
                 # 1. get hours for day
                 day_start = hour_str2float(from_hour)
@@ -157,7 +169,8 @@ def main():
                                 datum=datum,
                                 from_hour=hour_float2str(record_start),
                                 to_hour="11:30",
-                                project_identifier=project_identifier,
+                                project_identifier=project_identifier[0],
+                                note=project_identifier[1],
                             )
                         )
 
@@ -168,7 +181,8 @@ def main():
                                 to_hour=hour_float2str(
                                     record_start + hours_per_project
                                 ),
-                                project_identifier=project_identifier,
+                                project_identifier=project_identifier[0],
+                                note=project_identifier[1],
                             )
                         )
                     # 2.
@@ -178,7 +192,8 @@ def main():
                                 datum=datum,
                                 from_hour=hour_float2str(record_start),
                                 to_hour="11:30",
-                                project_identifier=project_identifier,
+                                project_identifier=project_identifier[0],
+                                note=project_identifier[1],
                             )
                         )
                     # 3.
@@ -193,7 +208,8 @@ def main():
                                 to_hour=hour_float2str(
                                     record_start + hours_per_project
                                 ),
-                                project_identifier=project_identifier,
+                                project_identifier=project_identifier[0],
+                                note=project_identifier[1],
                             )
                         )
                     # 4.
@@ -205,7 +221,8 @@ def main():
                                 to_hour=hour_float2str(
                                     record_start + hours_per_project
                                 ),
-                                project_identifier=project_identifier,
+                                project_identifier=project_identifier[0],
+                                note=project_identifier[1],
                             )
                         )
 
@@ -237,7 +254,7 @@ def main():
                 print(f"Error while sending record: {record}")
 
             # wait 0.5 second before sending next record
-            time.sleep(0.5)
+            time.sleep(0.15)
 
     print("Done")
     print(f"Month hours: {month_hours}")

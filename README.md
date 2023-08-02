@@ -25,12 +25,26 @@ cas_od - formát HH:MM
 
 cas_do - formát HH:MM
 
-project_id - ID projektu, který chcete vyplnit projektu může byt v jeden den více, musí být odděleny čárkou (viz příklad níže). Seznam projektů a jejich ID najdete v souboru projects.py, kde můžete také přidat do pole pomocnou zkratku projektu
+project_id - ID projektu, který chcete vyplnit projektu může byt v jeden den více, musí být odděleny čárkou (viz příklad níže). Seznam projektů a jejich ID najdete v souboru projects.py, kde můžete také přidat do pole pomocnou zkratku projektu.
+
+Za zkratku projektu je možné přidat poznámku oddělenou pomlčkou (viz příklad níže).
+V rámci textu poznámky tedy pomlčku již nepoužívat.
+
+```
+
 
 například:
 
 ```
-2023-06-01;8:00;16:30;SUDB
+
+2023-06-01;8:00;16:30;SUDB-vyrovnani plosek
 2023-06-02;8:00;16:30;2212.2
-2023-06-02;8:00;16:30;2212.2,Office
+2023-06-02;8:00;16:30;2212.2-test vypoctu,Office-vyplneni dochazky
+
+```
+
+
+## Change log
+
+2023-08-02 - Přidána možnost vyplnit poznámku k projektu
 ```

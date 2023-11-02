@@ -15,7 +15,7 @@ URL = "https://sep.teamexact.cz/dochazka"
 COOKIE = {"PHPSESSID": None}
 
 INPUT_FILE = "dochazka_test.csv"
-USER_ID = None # string ex. "1234", id can be get by program provider
+USER_ID = None  # string ex. "1234", id can be get by program provider
 
 # for now is used same id_type, id_location and id_stredisko for all records
 """
@@ -36,9 +36,9 @@ id_location:
     2 - Home Office
     3 - Prace v terenu
 """
-ID_STREDISKO = "11" 
+ID_STREDISKO = "11"
 ID_LOCATION = "1"
-ID_TYPE = "10" # bezna cinnost
+ID_TYPE = "10"  # bezna cinnost
 # ------------------
 
 if USER_ID is None or COOKIE["PHPSESSID"] is None:
@@ -90,18 +90,17 @@ def hour_float2str(hour: float) -> str:
 def main():
     month_hours = 0
 
-    with open(INPUT_FILE, "r",encoding='utf8') as f:
+    with open(INPUT_FILE, "r", encoding="utf8") as f:
         records_to_send = []
         for line in f.readlines():
             try:
-
                 # "\ufeff" is BOM (Byte Order Mark) for UTF-8
                 record = line.lstrip("\ufeff").strip().split(";")
 
                 datum = record[0]
                 from_hour = record[1]
                 to_hour = record[2]
-                project_identifiers = [("","")]
+                project_identifiers = [("", "")]
 
                 if len(record) == 4:
                     p_ids = record[3].split(",")
@@ -109,13 +108,11 @@ def main():
                     project_identifiers = []
 
                     for p_id in p_ids:
-
                         p_id_split = p_id.split("-")
                         if len(p_id_split) == 2:
                             project_identifiers.append((p_id_split[0], p_id_split[1]))
                         else:
                             project_identifiers.append((p_id_split[0], ""))
-                        
 
                 # 1. get hours for day
                 day_start = hour_str2float(from_hour)
@@ -127,13 +124,10 @@ def main():
                 else:
                     month_hours += day_hours
 
-
                 # 2. recallculate hours for projects and add lunch break
 
                 hours_per_project = day_hours / len(project_identifiers)
                 record_start = day_start
-
-
 
                 """ 
                 there is 4 options:
@@ -186,7 +180,10 @@ def main():
                             )
                         )
                     # 2.
-                    elif record_start < 11.5 and record_start + hours_per_project <= 12:
+                    elif (
+                        record_start < 11.5
+                        and 11.5 < (record_start + hours_per_project) <= 12
+                    ):
                         records_to_send.append(
                             create_record_payload(
                                 datum=datum,
@@ -251,7 +248,7 @@ def main():
                     print(f"Error while sending record: {record}")
 
             except Exception as e:
-                print(f"Error while sending record: {record}")
+                print(f"Error while sending record: {record} - {e}")
 
             # wait 0.5 second before sending next record
             time.sleep(0.15)

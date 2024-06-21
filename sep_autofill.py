@@ -15,6 +15,7 @@ URL = "https://sep.teamexact.cz/dochazka"
 COOKIE = {"PHPSESSID": None}
 
 INPUT_FILE = "dochazka_test.csv"
+SEND_TO_SERVER = True
 USER_ID = None  # string ex. "1234", id can be get by program provider
 
 # for now is used same id_type, id_location and id_stredisko for all records
@@ -232,26 +233,34 @@ def main():
         # 3. write records to file
         with open("payload.txt", "w") as f:
             for record in records_to_send:
-                f.write(str(record))
-                f.write(",\n")
+                try:
+                    f.write(str(record))
+                    f.write(",\n")
+                except Exception as e:
+                    print(f"Error while writing records to file:")
+                    print(f"Record:\n {record}")
 
         # 4. send records to sep
 
-        for rec_num, record in enumerate(records_to_send):
-            print(f"Sending record {rec_num + 1}/{len(records_to_send)}")
-            try:
-                # send POST request with record
-                response = requests.post(URL, data=record, cookies=COOKIE)
+        if SEND_TO_SERVER:
+            print("Sending records to server")
+            for rec_num, record in enumerate(records_to_send):
+                print(f"Sending record {rec_num + 1}/{len(records_to_send)}")
+                try:
+                    # send POST request with record
+                    response = requests.post(URL, data=record, cookies=COOKIE)
 
-                # check response status code
-                if response.status_code != 200:
-                    print(f"Error while sending record: {record}")
+                    # check response status code
+                    if response.status_code != 200:
+                        print(f"Error while sending record: {record}")
 
-            except Exception as e:
-                print(f"Error while sending record: {record} - {e}")
+                except Exception as e:
+                    print(f"Error while sending record: {record} - {e}")
 
-            # wait 0.5 second before sending next record
-            time.sleep(0.15)
+                # wait 0.5 second before sending next record
+                time.sleep(0.15)
+        else:
+            print("Skipping sending records to server")
 
     print("Done")
     print(f"Month hours: {month_hours}")
